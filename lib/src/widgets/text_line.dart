@@ -379,13 +379,16 @@ class _TextLineState extends State<TextLine> {
       return _linkRecognizers[segment]!;
     }
 
-    if (isDesktop() || widget.readOnly) {
+    _linkRecognizers[segment] = TapGestureRecognizer()
+      ..onTap = () => _tapNodeLink(segment);
+
+/*    if (isDesktop() || widget.readOnly) {
       _linkRecognizers[segment] = TapGestureRecognizer()
         ..onTap = () => _tapNodeLink(segment);
     } else {
       _linkRecognizers[segment] = LongPressGestureRecognizer()
         ..onLongPress = () => _longPressLink(segment);
-    }
+    }*/
     return _linkRecognizers[segment]!;
   }
 

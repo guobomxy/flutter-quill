@@ -136,12 +136,28 @@ class Line extends Container<Leaf?> {
           'It is not allowed to apply inline attributes to line itself.');
       _format(style);
     } else {
+
       // Otherwise forward to children as it's an inline format update.
-      assert(style.values.every((attr) =>
-          attr.scope == AttributeScope.INLINE ||
-          attr.scope == AttributeScope.IGNORE));
-      assert(index + local != thisLength);
-      super.retain(index, local, style);
+      assert(style.values.every((attr) => attr.scope == AttributeScope.INLINE
+          || attr.scope == AttributeScope.IGNORE));
+
+      // 如果是链接就先不去做其他判断
+      if(!style.values.any((attr) => attr.key == Attribute.link.key)){
+        assert(index + local != thisLength);
+        super.retain(index, local, style);
+      }else{
+        if(index + local != thisLength){
+          super.retain(index, local, style);
+        }
+      }
+
+
+      // Otherwise forward to children as it's an inline format update.
+      // assert(style.values.every((attr) =>
+      //     attr.scope == AttributeScope.INLINE ||
+      //     attr.scope == AttributeScope.IGNORE));
+      // assert(index + local != thisLength);
+      // super.retain(index, local, style);
     }
 
     final remain = len - local;

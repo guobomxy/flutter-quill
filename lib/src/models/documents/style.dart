@@ -40,7 +40,19 @@ class Style {
 
   bool get isNotEmpty => _attributes.isNotEmpty;
 
-  bool get isInline => isNotEmpty && values.every((item) => item.isInline);
+  // bool get isInline => isNotEmpty && values.every((item) => item.isInline);
+  /// 为适配结构化链接 修改为至少包含一个inline属性 有且只包含inline和ignore属性
+  bool get isInline {
+    if(isNotEmpty){
+      final hasInline = values.any((item) => item.isInline);
+      if(hasInline){
+        return values.every((item) =>
+        item.scope == AttributeScope.IGNORE || item.isInline
+        );
+      }
+    }
+    return false;
+  }
 
   bool get isIgnored =>
       isNotEmpty && values.every((item) => item.scope == AttributeScope.IGNORE);

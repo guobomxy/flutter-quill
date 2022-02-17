@@ -5,6 +5,8 @@ import 'delete.dart';
 import 'format.dart';
 import 'insert.dart';
 
+import '../../metanotey/format.dart';
+
 enum RuleType { INSERT, DELETE, FORMAT }
 
 abstract class Rule {
@@ -34,6 +36,7 @@ class Rules {
 
   final List<Rule> _rules;
   static final Rules _instance = Rules([
+    const MetaNoteyFormatLinkTypeRule(),
     const FormatLinkAtCaretPositionRule(),
     const ResolveLineFormatRule(),
     const ResolveInlineFormatRule(),

@@ -14,3 +14,8 @@ export 'src/widgets/editor.dart';
 export 'src/widgets/link.dart' show LinkActionPickerDelegate, LinkMenuAction;
 export 'src/widgets/style_widgets/style_widgets.dart';
 export 'src/widgets/toolbar.dart';
+
+/// metanotey添加
+export 'src/models/documents/nodes/container.dart';
+export 'src/models/documents/nodes/line.dart';
+export 'src/models/documents/nodes/node.dart';

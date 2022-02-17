@@ -63,6 +63,7 @@ class EditableTextBlock extends StatelessWidget {
       required this.indentLevelCounts,
       required this.onCheckboxTap,
       required this.readOnly,
+      required this.orderedListStartIndex,
       this.onLaunchUrl,
       this.customStyleBuilder,
       Key? key});
@@ -86,6 +87,9 @@ class EditableTextBlock extends StatelessWidget {
   final Map<int, int> indentLevelCounts;
   final Function(int, bool) onCheckboxTap;
   final bool readOnly;
+
+  /// 如果是有序列表 则标记当前块的开始序号
+  final int orderedListStartIndex;
 
   @override
   Widget build(BuildContext context) {
@@ -120,7 +124,7 @@ class EditableTextBlock extends StatelessWidget {
     final defaultStyles = QuillStyles.getStyles(context, false);
     final count = block.children.length;
     final children = <Widget>[];
-    var index = 0;
+    var index = orderedListStartIndex - 1;
     for (final line in Iterable.castFrom<dynamic, Line>(block.children)) {
       index++;
       final editableTextLine = EditableTextLine(

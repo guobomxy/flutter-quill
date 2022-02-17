@@ -433,12 +433,35 @@ class RawEditorState extends EditorState
   List<Widget> _buildChildren(Document doc, BuildContext context) {
     final result = <Widget>[];
     final indentLevelCounts = <int, int>{};
+    final currentIndentLevelCounts = <int, int>{};
+
     for (final node in doc.root.children) {
       if (node is Line) {
+        currentIndentLevelCounts.clear();
         final editableTextLine = _getEditableTextLineFromNode(node, context);
         result.add(editableTextLine);
       } else if (node is Block) {
         final attrs = node.style.attributes;
+
+        var indentLevel = 0;
+        if(attrs.containsKey(Attribute.indent.key)){
+          indentLevel = attrs[Attribute.indent.key]!.value;
+        }
+        var orderedListStartIndex = 1;
+        //如果是有序列表 则计算当前起始索引 并更新标记
+
+        if(attrs.containsValue(Attribute.ol) ){
+          final countAbove = currentIndentLevelCounts[indentLevel] ?? 0;
+          orderedListStartIndex = countAbove +1;
+          currentIndentLevelCounts[indentLevel] = countAbove + node.children.length;
+        }else{
+          //如果不是无序列表 或者不带缩进的无序列表 就清空标记 下一次列表从1开始
+          if(!attrs.containsValue(Attribute.ul)
+              || (attrs.containsValue(Attribute.ul) && !attrs.containsKey(Attribute.indent.key))){
+            currentIndentLevelCounts.clear();
+          }
+        }
+
         final editableTextBlock = EditableTextBlock(
             block: node,
             controller: widget.controller,
@@ -460,6 +483,7 @@ class RawEditorState extends EditorState
             indentLevelCounts: indentLevelCounts,
             onCheckboxTap: _handleCheckboxTap,
             readOnly: widget.readOnly,
+            orderedListStartIndex: orderedListStartIndex,
             customStyleBuilder: widget.customStyleBuilder);
         result.add(editableTextBlock);
       } else {

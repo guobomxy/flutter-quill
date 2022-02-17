@@ -4,6 +4,7 @@ import '../style.dart';
 import 'leaf.dart';
 import 'line.dart';
 import 'node.dart';
+import 'embeddable.dart';
 
 /// Container can accommodate other nodes.
 ///
@@ -113,11 +114,14 @@ abstract class Container<T extends Node?> extends Node {
 
   @override
   void insert(int index, Object data, Style? style) {
-    assert(index == 0 || (index > 0 && index < length));
+    print("index=$index length=$length data=$data");
+    assert(index == 0 || (index > 0 && index < length) || data is Embeddable || (data is String && data.trim().isEmpty) || data == null);
+    // assert(index == 0 || (index > 0 && index < length));
 
     if (isNotEmpty) {
       final child = queryChild(index, false);
-      child.node!.insert(child.offset, data, style);
+      // child.node!.insert(child.offset, data, style);
+      child.node?.insert(child.offset, data, style);
       return;
     }
 
