@@ -47,7 +47,7 @@ class Rules {
     const PreserveLineStyleOnSplitRule(),
     const ResetLineFormatOnNewLineRule(),
     const AutoFormatLinksRule(),
-    const AutoFormatMultipleLinksRule(),
+    // const AutoFormatMultipleLinksRule(), //去掉自动生成链接 防止结构化切换模式时高亮
     const PreserveInlineStylesRule(),
     const CatchAllInsertRule(),
     const EnsureEmbedLineRule(),
