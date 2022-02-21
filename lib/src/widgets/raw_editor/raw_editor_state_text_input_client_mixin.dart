@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/animation.dart';
@@ -5,12 +6,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 
+import '../../../flutter_quill.dart';
 import '../../models/documents/document.dart';
+import '../../models/documents/style.dart';
 import '../../utils/delta.dart';
 import '../editor.dart';
 
 mixin RawEditorStateTextInputClientMixin on EditorState
-    implements TextInputClient {
+implements TextInputClient {
   TextInputConnection? _textInputConnection;
   TextEditingValue? _lastKnownRemoteTextEditingValue;
 
@@ -153,8 +156,44 @@ mixin RawEditorStateTextInputClientMixin on EditorState
     if (diff.deleted.isEmpty && diff.inserted.isEmpty) {
       widget.controller.updateSelection(value.selection, ChangeSource.LOCAL);
     } else {
-      widget.controller.replaceText(
-          diff.start, diff.deleted.length, diff.inserted, value.selection);
+
+      if(Platform.isIOS){ // ios输入中文时加粗下划线无效问题
+
+        // final oldStyles = widget.controller.getAllIndividualSelectionStyles();
+
+        // final oldStyle = widget.controller.getAllSelectionStyles().first;
+        final oldStyle = widget.controller.getSelectionStyle();
+
+        widget.controller.replaceText(
+            diff.start, diff.deleted.length, diff.inserted, value.selection);
+
+        // 如果是点击了键盘上预选中文列表 并且 有这样式就加上去
+        // if(diff.deleted.isNotEmpty && oldStyle.isNotEmpty && (oldStyle.containsKey(Attribute.bold.key) || oldStyle.containsKey(Attribute.underline.key))){
+        if(diff.deleted.isNotEmpty ){
+          var attrs = <String, Attribute>{};
+          if(oldStyle.isNotEmpty){
+            oldStyle.attributes.forEach((key, value) {
+              attrs[key] = value;
+            });
+          }
+
+          // 如果没有就清除相关inline格式
+          Attribute.inlineKeys.forEach((key) {
+            if(!oldStyle.containsKey(Attribute.bold.key)){
+              attrs[key] = Attribute(key, AttributeScope.INLINE, null);
+            }
+          });
+
+          var currStyle = Style.attr(attrs);
+          widget.controller.formatTextStyle(diff.start, diff.inserted.length, currStyle);
+        }
+
+
+      }else{
+        widget.controller.replaceText(
+            diff.start, diff.deleted.length, diff.inserted, value.selection);
+      }
+
     }
   }
 
@@ -204,7 +243,7 @@ mixin RawEditorStateTextInputClientMixin on EditorState
         _pointOffsetOrigin = point.offset;
 
         final currentTextPosition =
-            TextPosition(offset: renderEditor.selection.baseOffset);
+        TextPosition(offset: renderEditor.selection.baseOffset);
         _startCaretRect =
             renderEditor.getLocalRectForCaret(currentTextPosition);
 
@@ -222,7 +261,7 @@ mixin RawEditorStateTextInputClientMixin on EditorState
             _startCaretRect!.center + centeredPoint - floatingCursorOffset;
 
         final preferredLineHeight =
-            renderEditor.preferredLineHeight(_lastTextPosition!);
+        renderEditor.preferredLineHeight(_lastTextPosition!);
         _lastBoundedOffset = renderEditor.calculateBoundedFloatingCursorOffset(
           rawCursorOffset,
           preferredLineHeight,
@@ -240,7 +279,7 @@ mixin RawEditorStateTextInputClientMixin on EditorState
             newSelection, SelectionChangedCause.forcePress);
         break;
       case FloatingCursorDragState.End:
-        // We skip animation if no update has happened.
+      // We skip animation if no update has happened.
         if (_lastTextPosition != null && _lastBoundedOffset != null) {
           floatingCursorResetController
             ..value = 0.0
@@ -271,9 +310,9 @@ mixin RawEditorStateTextInputClientMixin on EditorState
     } else {
       final lerpValue = floatingCursorResetController.value;
       final lerpX =
-          lerpDouble(_lastBoundedOffset!.dx, finalPosition.dx, lerpValue)!;
+      lerpDouble(_lastBoundedOffset!.dx, finalPosition.dx, lerpValue)!;
       final lerpY =
-          lerpDouble(_lastBoundedOffset!.dy, finalPosition.dy, lerpValue)!;
+      lerpDouble(_lastBoundedOffset!.dy, finalPosition.dy, lerpValue)!;
 
       renderEditor.setFloatingCursor(FloatingCursorDragState.Update,
           Offset(lerpX, lerpY), _lastTextPosition!,
