@@ -179,15 +179,14 @@ implements TextInputClient {
 
           // 如果没有就清除相关inline格式
           Attribute.inlineKeys.forEach((key) {
-            if(!oldStyle.containsKey(Attribute.bold.key)){
-              attrs[key] = Attribute(key, AttributeScope.INLINE, null);
+            if(!oldStyle.containsKey(key)){
+              attrs[key] = Attribute.fromKeyValue(key, null)!;
             }
           });
 
           var currStyle = Style.attr(attrs);
           widget.controller.formatTextStyle(diff.start, diff.inserted.length, currStyle);
         }
-
 
       }else{
         widget.controller.replaceText(
