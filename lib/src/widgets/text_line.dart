@@ -380,7 +380,7 @@ class _TextLineState extends State<TextLine> {
     }
 
     _linkRecognizers[segment] = TapGestureRecognizer()
-      ..onTap = () => _tapNodeLink(segment);
+      ..onTap = (){ _tapNodeLink(segment); };
 
 /*    if (isDesktop() || widget.readOnly) {
       _linkRecognizers[segment] = TapGestureRecognizer()
