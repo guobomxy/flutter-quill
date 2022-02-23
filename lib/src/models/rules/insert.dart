@@ -444,6 +444,11 @@ class AutoFormatLinksRule extends InsertRule {
 
     try {
       final cand = (prev.data as String).split('\n').last.split(' ').last;
+
+      if(cand.length > 1000){
+        return null;
+      }
+
       final link = Uri.parse(cand);
       if (!['https', 'http'].contains(link.scheme)) {
         return null;
