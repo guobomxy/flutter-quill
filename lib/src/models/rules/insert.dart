@@ -445,7 +445,7 @@ class AutoFormatLinksRule extends InsertRule {
     try {
       final cand = (prev.data as String).split('\n').last.split(' ').last;
 
-      if(cand.length > 1000){
+      if(cand.length > 1000 || RegExp(r'(https?:\/\/\S+\/mine\/memo\?slug=([A-Za-z0-9]{24}))', caseSensitive: false).hasMatch(cand)){
         return null;
       }
 
