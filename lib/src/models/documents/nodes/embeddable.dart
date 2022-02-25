@@ -36,4 +36,9 @@ class BlockEmbed extends Embeddable {
 
   static const String videoType = 'video';
   static BlockEmbed video(String videoUrl) => BlockEmbed(videoType, videoUrl);
+
+  /// card of link
+  static const String linkCardType = 'cardOfLink';
+  static BlockEmbed linkCard(String script) => BlockEmbed(linkCardType, script);
+
 }

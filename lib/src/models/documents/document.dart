@@ -270,17 +270,17 @@ class Document {
     for (var i = 0; i < ops.length; i++) {
       final op = ops[i];
       res.push(op);
-      _autoAppendNewlineAfterEmbeddable(i, ops, op, res, BlockEmbed.videoType);
+      _autoAppendNewlineAfterEmbeddable(i, ops, op, res, [BlockEmbed.videoType,BlockEmbed.linkCardType]);
     }
     return res;
   }
 
   static void _autoAppendNewlineAfterEmbeddable(
-      int i, List<Operation> ops, Operation op, Delta res, String type) {
+      int i, List<Operation> ops, Operation op, Delta res, List<String> types) {
     final nextOpIsEmbed = i + 1 < ops.length &&
         ops[i + 1].isInsert &&
         ops[i + 1].data is Map &&
-        (ops[i + 1].data as Map).containsKey(type);
+        (ops[i + 1].data as Map).keys.any((element) => types.contains(element));
     if (nextOpIsEmbed &&
         op.data is String &&
         (op.data as String).isNotEmpty &&
@@ -289,7 +289,7 @@ class Document {
     }
     // embed could be image or video
     final opInsertEmbed =
-        op.isInsert && op.data is Map && (op.data as Map).containsKey(type);
+        op.isInsert && op.data is Map && (op.data as Map).keys.any((element) => types.contains(element));
     final nextOpIsLineBreak = i + 1 < ops.length &&
         ops[i + 1].isInsert &&
         ops[i + 1].data is String &&
