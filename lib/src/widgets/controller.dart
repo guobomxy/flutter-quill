@@ -177,7 +177,13 @@ class QuillController extends ChangeNotifier {
       if (shouldRetainDelta) {
         final retainDelta = Delta()
           ..retain(index)
-          ..retain(data is String ? data.length : 1, toggledStyle.toJson());
+          ..retain(data is String ? data.length : 1,
+              data == '\n' ? Attribute('',AttributeScope.IGNORE,null).toJson() : toggledStyle.toJson());
+
+        // final retainDelta = Delta()
+        //   ..retain(index)
+        //   ..retain(data is String ? data.length : 1, toggledStyle.toJson());
+
         document.compose(retainDelta, ChangeSource.LOCAL);
       }
     }
