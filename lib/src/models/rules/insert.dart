@@ -86,7 +86,7 @@ class PreserveBlockStyleOnInsertRule extends InsertRule {
     // Look for the next newline.
     final nextNewLine = _getNextNewLine(itr);
     final lineStyle =
-        Style.fromJson(nextNewLine.item1?.attributes ?? <String, dynamic>{});
+    Style.fromJson(nextNewLine.item1?.attributes ?? <String, dynamic>{});
 
     final blockStyle = lineStyle.getBlocksExceptHeader();
     // Are we currently in a block? If not then ignore.
@@ -118,7 +118,7 @@ class PreserveBlockStyleOnInsertRule extends InsertRule {
         final blockAttributes = blockStyle.isEmpty
             ? null
             : blockStyle.map<String, dynamic>((_, attribute) =>
-                MapEntry<String, dynamic>(attribute.key, attribute.value));
+            MapEntry<String, dynamic>(attribute.key, attribute.value));
         delta.insert('\n', blockAttributes);
       }
     }
@@ -200,7 +200,7 @@ class AutoExitBlockRule extends InsertRule {
     // therefore we can exit this block.
     final attributes = cur.attributes ?? <String, dynamic>{};
     final k =
-        attributes.keys.firstWhere(Attribute.blockKeysExceptHeader.contains);
+    attributes.keys.firstWhere(Attribute.blockKeysExceptHeader.contains);
     attributes[k] = null;
     // retain(1) should be '\n', set it with no attribute
     return Delta()
@@ -336,12 +336,12 @@ class AutoFormatMultipleLinksRule extends InsertRule {
 
   @override
   Delta? applyRule(
-    Delta document,
-    int index, {
-    int? len,
-    Object? data,
-    Attribute? attribute,
-  }) {
+      Delta document,
+      int index, {
+        int? len,
+        Object? data,
+        Attribute? attribute,
+      }) {
     // Only format when inserting text.
     if (data is! String) return null;
 
@@ -350,24 +350,24 @@ class AutoFormatMultipleLinksRule extends InsertRule {
 
     // Get word before insertion.
     final leftWordPart = entireText
-        // Keep all text before insertion.
+    // Keep all text before insertion.
         .substring(0, index)
-        // Keep last paragraph.
+    // Keep last paragraph.
         .split('\n')
         .last
-        // Keep last word.
+    // Keep last word.
         .split(' ')
         .last
         .trimLeft();
 
     // Get word after insertion.
     final rightWordPart = entireText
-        // Keep all text after insertion.
+    // Keep all text after insertion.
         .substring(index)
-        // Keep first paragraph.
+    // Keep first paragraph.
         .split('\n')
         .first
-        // Keep first word.
+    // Keep first word.
         .split(' ')
         .first
         .trimRight();
@@ -445,9 +445,12 @@ class AutoFormatLinksRule extends InsertRule {
     try {
       final cand = (prev.data as String).split('\n').last.split(' ').last;
 
+
       if(cand.length > 1000 || RegExp(r'(https?:\/\/\S+\/mine\/memo\?slug=([A-Za-z0-9]{24}))', caseSensitive: false).hasMatch(cand)){
         return null;
       }
+
+
 
       final link = Uri.parse(cand);
       if (!['https', 'http'].contains(link.scheme)) {
@@ -486,6 +489,23 @@ class PreserveInlineStylesRule extends InsertRule {
     if (prev == null ||
         prev.data is! String ||
         (prev.data as String).contains('\n')) {
+
+      //要定位到下一个
+      if(itr.hasNext){
+        final cur = itr.next();
+        //如果是checked换行后要加上删除线样式
+        if(cur.attributes != null && cur.attributes!.containsValue(Attribute.checked.value)){
+          return Delta()
+            ..retain(index + (len ?? 0))
+            ..insert(data,Attribute.strikeThrough.toJson());
+        }else if(cur.attributes != null && cur.attributes!.containsValue(Attribute.strikeThrough.value)){
+          // 在多选框和内容之间插入内容时要把删除线带上
+          return Delta()
+            ..retain(index + (len ?? 0))
+            ..insert(data,Attribute.strikeThrough.toJson());
+        }
+      }
+
       return null;
     }
 
@@ -534,7 +554,7 @@ Tuple2<Operation?, int?> _getNextNewLine(DeltaIterator iterator) {
   for (var skipped = 0; iterator.hasNext; skipped += op.length!) {
     op = iterator.next();
     final lineBreak =
-        (op.data is String ? op.data as String? : '')!.indexOf('\n');
+    (op.data is String ? op.data as String? : '')!.indexOf('\n');
     if (lineBreak >= 0) {
       return Tuple2(op, skipped);
     }

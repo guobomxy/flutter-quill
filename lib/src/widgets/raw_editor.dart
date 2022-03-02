@@ -408,7 +408,7 @@ class RawEditorState extends EditorState
 
   /// Updates the checkbox positioned at [offset] in document
   /// by changing its attribute according to [value].
-  void _handleCheckboxTap(int offset, bool value) {
+  void _handleCheckboxTap(int offset, int contentLen, bool value) {
     if (!widget.readOnly) {
       _disableScrollControllerAnimateOnce = true;
       final attribute = value ? Attribute.checked : Attribute.unchecked;
@@ -426,6 +426,10 @@ class RawEditorState extends EditorState
       SchedulerBinding.instance!.addPostFrameCallback((_) {
         widget.controller.updateSelection(
             TextSelection.collapsed(offset: offset), ChangeSource.LOCAL);
+        widget.controller.formatText(
+            offset, contentLen,
+            value ? Attribute.strikeThrough
+                : Attribute.clone(Attribute.strikeThrough, null));
       });
     }
   }

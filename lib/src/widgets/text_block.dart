@@ -85,7 +85,7 @@ class EditableTextBlock extends StatelessWidget {
   final CustomStyleBuilder? customStyleBuilder;
   final CursorCont cursorCont;
   final Map<int, int> indentLevelCounts;
-  final Function(int, bool) onCheckboxTap;
+  final Function(int offset, int contentLen, bool) onCheckboxTap;
   final bool readOnly;
 
   /// 如果是有序列表 则标记当前块的开始序号
@@ -184,7 +184,7 @@ class EditableTextBlock extends StatelessWidget {
         size: 14,
         value: true,
         enabled: !readOnly,
-        onChanged: (checked) => onCheckboxTap(line.documentOffset, checked),
+        onChanged: (checked) => onCheckboxTap(line.documentOffset, line.length - 1, checked),
         uiBuilder: defaultStyles?.lists?.checkboxUIBuilder,
       );
     }
@@ -194,7 +194,7 @@ class EditableTextBlock extends StatelessWidget {
         size: 14,
         value: false,
         enabled: !readOnly,
-        onChanged: (checked) => onCheckboxTap(line.documentOffset, checked),
+        onChanged: (checked) => onCheckboxTap(line.documentOffset, line.length - 1, checked),
         uiBuilder: defaultStyles?.lists?.checkboxUIBuilder,
       );
     }
