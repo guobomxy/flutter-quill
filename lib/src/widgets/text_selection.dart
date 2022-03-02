@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter_quill/src/widgets/raw_editor.dart';
 
 import '../models/documents/nodes/node.dart';
 import 'editor.dart';
@@ -307,6 +308,11 @@ class EditorTextSelectionOverlay {
   }
 
   Widget _buildToolbar(BuildContext context) {
+
+    if(debugRequiredFor is RawEditor){
+      value = (debugRequiredFor as RawEditor).controller.plainTextEditingValue;
+    }
+
     // Find the horizontal midpoint, just above the selected text.
     final endpoints = renderObject.getEndpointsForSelection(_selection);
 
