@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -207,7 +208,9 @@ class _TextLineState extends State<TextLine> {
 
   TextSpan _buildTextSpan(DefaultStyles defaultStyles, LinkedList<Node> nodes,
       TextStyle lineStyle) {
-    final children = nodes
+    final shouldWrap = nodes.isEmpty && kIsWeb;
+    final newNodes = LinkedList<Node>()..add(leaf.Text('\u{200B}'));
+    final children = (shouldWrap ? newNodes : nodes)
         .map((node) =>
             _getTextSpanFromNode(defaultStyles, node, widget.line.style))
         .toList(growable: false);

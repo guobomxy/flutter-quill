@@ -1,3 +1,24 @@
+# [4.0.8]
+* Fix blank lines do not display when --web-renderer=html.
+
+# [4.0.7]
+* Refactor getPlainText (better handling of blank lines and lines with multiple markups.
+
+# [4.0.6]
+* Bug fix for copying text with new lines.
+
+# [4.0.5]
+* Fixed casting null to Tuple2 when link dialog is dismissed without any input (e.g. barrier dismissed).
+
+# [4.0.4]
+* Bug fix for text direction rtl.
+
+# [4.0.3]
+* Support text direction rtl.
+
+# [4.0.2]
+* Clear toggled style on selection change.
+
 # [4.0.1]
 * Fix copy/cut/paste/selectAll not working.
 
