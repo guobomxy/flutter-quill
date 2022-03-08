@@ -511,6 +511,13 @@ class PreserveInlineStylesRule extends InsertRule {
 
     final attributes = prev.attributes;
     final text = data;
+
+
+    return Delta()
+      ..retain(index + (len ?? 0))
+      ..insert(text, attributes);
+
+/*
     if (attributes == null || !attributes.containsKey(Attribute.link.key)) {
       return Delta()
         ..retain(index + (len ?? 0))
@@ -533,6 +540,8 @@ class PreserveInlineStylesRule extends InsertRule {
         ..insert(text, attributes);
     }
     return delta;
+*/
+
   }
 }
 
