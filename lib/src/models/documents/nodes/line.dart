@@ -427,6 +427,8 @@ class Line extends Container<Leaf?> {
           pos += node.length;
         }
       }
+    }else{
+      result.add(Tuple2(beg, Style.attr({})));
     }
 
     // TODO: add line style and parent's block style
@@ -434,7 +436,7 @@ class Line extends Container<Leaf?> {
     final remaining = len - local;
     if (remaining > 0) {
       final rest =
-          nextLine!.collectAllIndividualStyles(0, remaining, beg: local);
+      nextLine!.collectAllIndividualStyles(0, remaining, beg: local + beg);
       result.addAll(rest);
     }
 

@@ -45,7 +45,7 @@ mixin RawEditorStateSelectionDelegateMixin on EditorState
             pos + offset,
             i == pasteStyle.length - 1
                 ? pastePlainText.length - offset
-                : pasteStyle[i + 1].item1,
+                : pasteStyle[i + 1].item1 - offset,
             style);
       }
     }
