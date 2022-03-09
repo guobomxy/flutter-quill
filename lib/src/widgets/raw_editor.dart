@@ -40,44 +40,44 @@ import 'text_selection.dart';
 class RawEditor extends StatefulWidget {
   const RawEditor(
       {required this.controller,
-      required this.focusNode,
-      required this.scrollController,
-      required this.scrollBottomInset,
-      required this.cursorStyle,
-      required this.selectionColor,
-      required this.selectionCtrls,
-      Key? key,
-      this.scrollable = true,
-      this.padding = EdgeInsets.zero,
-      this.readOnly = false,
-      this.placeholder,
-      this.onLaunchUrl,
-      this.toolbarOptions = const ToolbarOptions(
-        copy: true,
-        cut: true,
-        paste: true,
-        selectAll: true,
-      ),
-      this.showSelectionHandles = false,
-      bool? showCursor,
-      this.textCapitalization = TextCapitalization.none,
-      this.maxHeight,
-      this.minHeight,
-      this.maxContentWidth,
-      this.customStyles,
-      this.expands = false,
-      this.autoFocus = false,
-      this.keyboardAppearance = Brightness.light,
-      this.enableInteractiveSelection = true,
-      this.scrollPhysics,
-      this.embedBuilder = defaultEmbedBuilder,
-      this.linkActionPickerDelegate = defaultLinkActionPickerDelegate,
-      this.customStyleBuilder,
-      this.floatingCursorDisabled = false})
+        required this.focusNode,
+        required this.scrollController,
+        required this.scrollBottomInset,
+        required this.cursorStyle,
+        required this.selectionColor,
+        required this.selectionCtrls,
+        Key? key,
+        this.scrollable = true,
+        this.padding = EdgeInsets.zero,
+        this.readOnly = false,
+        this.placeholder,
+        this.onLaunchUrl,
+        this.toolbarOptions = const ToolbarOptions(
+          copy: true,
+          cut: true,
+          paste: true,
+          selectAll: true,
+        ),
+        this.showSelectionHandles = false,
+        bool? showCursor,
+        this.textCapitalization = TextCapitalization.none,
+        this.maxHeight,
+        this.minHeight,
+        this.maxContentWidth,
+        this.customStyles,
+        this.expands = false,
+        this.autoFocus = false,
+        this.keyboardAppearance = Brightness.light,
+        this.enableInteractiveSelection = true,
+        this.scrollPhysics,
+        this.embedBuilder = defaultEmbedBuilder,
+        this.linkActionPickerDelegate = defaultLinkActionPickerDelegate,
+        this.customStyleBuilder,
+        this.floatingCursorDisabled = false})
       : assert(maxHeight == null || maxHeight > 0, 'maxHeight cannot be null'),
         assert(minHeight == null || minHeight >= 0, 'minHeight cannot be null'),
         assert(maxHeight == null || minHeight == null || maxHeight >= minHeight,
-            'maxHeight cannot be null'),
+        'maxHeight cannot be null'),
         showCursor = showCursor ?? true,
         super(key: key);
 
@@ -230,6 +230,10 @@ class RawEditor extends StatefulWidget {
   State<StatefulWidget> createState() => RawEditorState();
 }
 
+/// 支持全局粘贴带样式
+List<Tuple2<int, Style>> _pasteStyle = <Tuple2<int, Style>>[];
+String _pastePlainText = '';
+
 class RawEditorState extends EditorState
     with
         AutomaticKeepAliveClientMixin<RawEditor>,
@@ -267,10 +271,10 @@ class RawEditorState extends EditorState
   // for pasting style
   @override
   List<Tuple2<int, Style>> get pasteStyle => _pasteStyle;
-  List<Tuple2<int, Style>> _pasteStyle = <Tuple2<int, Style>>[];
+
   @override
   String get pastePlainText => _pastePlainText;
-  String _pastePlainText = '';
+
 
   final ClipboardStatusNotifier _clipboardStatus = ClipboardStatusNotifier();
   final LayerLink _toolbarLayerLink = LayerLink();
@@ -322,7 +326,7 @@ class RawEditorState extends EditorState
       /// baseline.
       // This implies that the first line has no styles applied to it.
       final baselinePadding =
-          EdgeInsets.only(top: _styles!.paragraph!.verticalSpacing.item1);
+      EdgeInsets.only(top: _styles!.paragraph!.verticalSpacing.item1);
       child = BaselineProxy(
         textStyle: _styles!.paragraph!.style,
         padding: baselinePadding,
@@ -358,8 +362,8 @@ class RawEditorState extends EditorState
     final constraints = widget.expands
         ? const BoxConstraints.expand()
         : BoxConstraints(
-            minHeight: widget.minHeight ?? 0.0,
-            maxHeight: widget.maxHeight ?? double.infinity);
+        minHeight: widget.minHeight ?? 0.0,
+        maxHeight: widget.maxHeight ?? double.infinity);
 
     return QuillStyles(
       data: _styles!,
@@ -600,11 +604,11 @@ class RawEditorState extends EditorState
           _keyboardVisible = _keyboardVisibilityController!.isVisible;
           _keyboardVisibilitySubscription =
               _keyboardVisibilityController?.onChange.listen((visible) {
-            _keyboardVisible = visible;
-            if (visible) {
-              _onChangeTextEditingValue(!_hasFocus);
-            }
-          });
+                _keyboardVisible = visible;
+                if (visible) {
+                  _onChangeTextEditingValue(!_hasFocus);
+                }
+              });
         }
       });
     }
@@ -837,7 +841,7 @@ class RawEditorState extends EditorState
 
         final viewport = RenderAbstractViewport.of(renderEditor);
         final editorOffset =
-            renderEditor.localToGlobal(const Offset(0, 0), ancestor: viewport);
+        renderEditor.localToGlobal(const Offset(0, 0), ancestor: viewport);
         final offsetInViewport = _scrollController.offset + editorOffset.dy;
 
         final offset = renderEditor.getOffsetToRevealCursor(
@@ -941,7 +945,7 @@ class RawEditorState extends EditorState
         TextEditingValue(
           text: textEditingValue.text,
           selection:
-              TextSelection.collapsed(offset: textEditingValue.selection.end),
+          TextSelection.collapsed(offset: textEditingValue.selection.end),
         ),
         SelectionChangedCause.toolbar,
       );
@@ -1048,7 +1052,7 @@ class RawEditorState extends EditorState
 
   _TextBoundary _characterBoundary(DirectionalTextEditingIntent intent) {
     final _TextBoundary atomicTextBoundary =
-        _CharacterBoundary(textEditingValue);
+    _CharacterBoundary(textEditingValue);
     return _CollapsedSelectionBoundary(atomicTextBoundary, intent.forward);
   }
 
@@ -1087,9 +1091,9 @@ class RawEditorState extends EditorState
     // already caret-location based.
     return intent.forward
         ? _MixedBoundary(
-            _CollapsedSelectionBoundary(atomicTextBoundary, true), boundary)
+        _CollapsedSelectionBoundary(atomicTextBoundary, true), boundary)
         : _MixedBoundary(
-            boundary, _CollapsedSelectionBoundary(atomicTextBoundary, false));
+        boundary, _CollapsedSelectionBoundary(atomicTextBoundary, false));
   }
 
   _TextBoundary _documentBoundary(DirectionalTextEditingIntent intent) =>
@@ -1101,7 +1105,7 @@ class RawEditorState extends EditorState
   }
 
   late final Action<ReplaceTextIntent> _replaceTextAction =
-      CallbackAction<ReplaceTextIntent>(onInvoke: _replaceText);
+  CallbackAction<ReplaceTextIntent>(onInvoke: _replaceText);
 
   void _updateSelection(UpdateSelectionIntent intent) {
     userUpdateTextEditingValue(
@@ -1111,12 +1115,12 @@ class RawEditorState extends EditorState
   }
 
   late final Action<UpdateSelectionIntent> _updateSelectionAction =
-      CallbackAction<UpdateSelectionIntent>(onInvoke: _updateSelection);
+  CallbackAction<UpdateSelectionIntent>(onInvoke: _updateSelection);
 
   late final _UpdateTextSelectionToAdjacentLineAction<
-          ExtendSelectionVerticallyToAdjacentLineIntent> _adjacentLineAction =
-      _UpdateTextSelectionToAdjacentLineAction<
-          ExtendSelectionVerticallyToAdjacentLineIntent>(this);
+      ExtendSelectionVerticallyToAdjacentLineIntent> _adjacentLineAction =
+  _UpdateTextSelectionToAdjacentLineAction<
+      ExtendSelectionVerticallyToAdjacentLineIntent>(this);
 
   late final Map<Type, Action<Intent>> _actions = <Type, Action<Intent>>{
     DoNothingAndStopPropagationTextIntent: DoNothingAction(consumesKey: false),
@@ -1136,10 +1140,10 @@ class RawEditorState extends EditorState
     // Extend/Move Selection
     ExtendSelectionByCharacterIntent: _makeOverridable(
         _UpdateTextSelectionAction<ExtendSelectionByCharacterIntent>(
-      this,
-      false,
-      _characterBoundary,
-    )),
+          this,
+          false,
+          _characterBoundary,
+        )),
     ExtendSelectionToNextWordBoundaryIntent: _makeOverridable(
         _UpdateTextSelectionAction<ExtendSelectionToNextWordBoundaryIntent>(
             this, true, _nextWordBoundary)),
@@ -1147,7 +1151,7 @@ class RawEditorState extends EditorState
         _UpdateTextSelectionAction<ExtendSelectionToLineBreakIntent>(
             this, true, _linebreak)),
     ExtendSelectionVerticallyToAdjacentLineIntent:
-        _makeOverridable(_adjacentLineAction),
+    _makeOverridable(_adjacentLineAction),
     ExtendSelectionToDocumentBoundaryIntent: _makeOverridable(
         _UpdateTextSelectionAction<ExtendSelectionToDocumentBoundaryIntent>(
             this, true, _documentBoundary)),
@@ -1301,8 +1305,8 @@ class _WhitespaceBoundary extends _TextBoundary {
   @override
   TextPosition getTrailingTextBoundaryAt(TextPosition position) {
     for (var index = position.offset;
-        index < textEditingValue.text.length;
-        index += 1) {
+    index < textEditingValue.text.length;
+    index += 1) {
       if (!TextLayoutMetrics.isWhitespace(
           textEditingValue.text.codeUnitAt(index))) {
         return TextPosition(offset: index + 1);
@@ -1324,20 +1328,20 @@ class _CharacterBoundary extends _TextBoundary {
   @override
   TextPosition getLeadingTextBoundaryAt(TextPosition position) {
     final int endOffset =
-        math.min(position.offset + 1, textEditingValue.text.length);
+    math.min(position.offset + 1, textEditingValue.text.length);
     return TextPosition(
       offset:
-          CharacterRange.at(textEditingValue.text, position.offset, endOffset)
-              .stringBeforeLength,
+      CharacterRange.at(textEditingValue.text, position.offset, endOffset)
+          .stringBeforeLength,
     );
   }
 
   @override
   TextPosition getTrailingTextBoundaryAt(TextPosition position) {
     final int endOffset =
-        math.min(position.offset + 1, textEditingValue.text.length);
+    math.min(position.offset + 1, textEditingValue.text.length);
     final range =
-        CharacterRange.at(textEditingValue.text, position.offset, endOffset);
+    CharacterRange.at(textEditingValue.text, position.offset, endOffset);
     return TextPosition(
       offset: textEditingValue.text.length - range.stringAfterLength,
     );
@@ -1346,9 +1350,9 @@ class _CharacterBoundary extends _TextBoundary {
   @override
   TextRange getTextBoundaryAt(TextPosition position) {
     final int endOffset =
-        math.min(position.offset + 1, textEditingValue.text.length);
+    math.min(position.offset + 1, textEditingValue.text.length);
     final range =
-        CharacterRange.at(textEditingValue.text, position.offset, endOffset);
+    CharacterRange.at(textEditingValue.text, position.offset, endOffset);
     return TextRange(
       start: range.stringBeforeLength,
       end: textEditingValue.text.length - range.stringAfterLength,
@@ -1371,7 +1375,7 @@ class _WordBoundary extends _TextBoundary {
       offset: textLayout.getWordBoundary(position).start,
       // Word boundary seems to always report downstream on many platforms.
       affinity:
-          TextAffinity.downstream, // ignore: avoid_redundant_argument_values
+      TextAffinity.downstream, // ignore: avoid_redundant_argument_values
     );
   }
 
@@ -1381,7 +1385,7 @@ class _WordBoundary extends _TextBoundary {
       offset: textLayout.getWordBoundary(position).end,
       // Word boundary seems to always report downstream on many platforms.
       affinity:
-          TextAffinity.downstream, // ignore: avoid_redundant_argument_values
+      TextAffinity.downstream, // ignore: avoid_redundant_argument_values
     );
   }
 }
@@ -1483,9 +1487,9 @@ class _CollapsedSelectionBoundary extends _TextBoundary {
     return isForward
         ? innerTextBoundary.getLeadingTextBoundaryAt(position)
         : position.offset <= 0
-            ? const TextPosition(offset: 0)
-            : innerTextBoundary.getLeadingTextBoundaryAt(
-                TextPosition(offset: position.offset - 1));
+        ? const TextPosition(offset: 0)
+        : innerTextBoundary.getLeadingTextBoundaryAt(
+        TextPosition(offset: position.offset - 1));
   }
 
   @override
@@ -1493,9 +1497,9 @@ class _CollapsedSelectionBoundary extends _TextBoundary {
     return isForward
         ? innerTextBoundary.getTrailingTextBoundaryAt(position)
         : position.offset <= 0
-            ? const TextPosition(offset: 0)
-            : innerTextBoundary.getTrailingTextBoundaryAt(
-                TextPosition(offset: position.offset - 1));
+        ? const TextPosition(offset: 0)
+        : innerTextBoundary.getTrailingTextBoundaryAt(
+        TextPosition(offset: position.offset - 1));
   }
 }
 
@@ -1689,8 +1693,8 @@ class _ExtendSelectionOrCaretPositionAction extends ContextAction<
 
   final RawEditorState state;
   final _TextBoundary Function(
-          ExtendSelectionToNextWordBoundaryOrCaretLocationIntent intent)
-      getTextBoundariesForIntent;
+      ExtendSelectionToNextWordBoundaryOrCaretLocationIntent intent)
+  getTextBoundariesForIntent;
 
   @override
   Object? invoke(ExtendSelectionToNextWordBoundaryOrCaretLocationIntent intent,
@@ -1710,16 +1714,16 @@ class _ExtendSelectionOrCaretPositionAction extends ContextAction<
         : textBoundary.getLeadingTextBoundaryAt(extent);
 
     final newSelection = (newExtent.offset - textBoundarySelection.baseOffset) *
-                (textBoundarySelection.extentOffset -
-                    textBoundarySelection.baseOffset) <
-            0
+        (textBoundarySelection.extentOffset -
+            textBoundarySelection.baseOffset) <
+        0
         ? textBoundarySelection.copyWith(
-            extentOffset: textBoundarySelection.baseOffset,
-            affinity: textBoundarySelection.extentOffset >
-                    textBoundarySelection.baseOffset
-                ? TextAffinity.downstream
-                : TextAffinity.upstream,
-          )
+      extentOffset: textBoundarySelection.baseOffset,
+      affinity: textBoundarySelection.extentOffset >
+          textBoundarySelection.baseOffset
+          ? TextAffinity.downstream
+          : TextAffinity.upstream,
+    )
         : textBoundarySelection.extendTo(newExtent);
 
     return Actions.invoke(
@@ -1735,7 +1739,7 @@ class _ExtendSelectionOrCaretPositionAction extends ContextAction<
 }
 
 class _UpdateTextSelectionToAdjacentLineAction<
-    T extends DirectionalCaretMovementIntent> extends ContextAction<T> {
+T extends DirectionalCaretMovementIntent> extends ContextAction<T> {
   _UpdateTextSelectionToAdjacentLineAction(this.state);
 
   final RawEditorState state;
@@ -1777,12 +1781,12 @@ class _UpdateTextSelectionToAdjacentLineAction<
             .startVerticalCaretMovement(state.renderEditor.selection.extent);
 
     final shouldMove =
-        intent.forward ? currentRun.moveNext() : currentRun.movePrevious();
+    intent.forward ? currentRun.moveNext() : currentRun.movePrevious();
     final newExtent = shouldMove
         ? currentRun.current
         : (intent.forward
-            ? TextPosition(offset: state.textEditingValue.text.length)
-            : const TextPosition(offset: 0));
+        ? TextPosition(offset: state.textEditingValue.text.length)
+        : const TextPosition(offset: 0));
     final newSelection = collapseSelection
         ? TextSelection.fromPosition(newExtent)
         : value.selection.extendTo(newExtent);
@@ -1841,5 +1845,5 @@ class _CopySelectionAction extends ContextAction<CopySelectionTextIntent> {
   @override
   bool get isActionEnabled =>
       state.textEditingValue.selection.isValid &&
-      !state.textEditingValue.selection.isCollapsed;
+          !state.textEditingValue.selection.isCollapsed;
 }
