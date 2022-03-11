@@ -2,6 +2,8 @@ import 'dart:collection';
 
 import 'package:quiver/core.dart';
 
+import '../../../flutter_quill.dart';
+
 enum AttributeScope {
   INLINE, // refer to https://quilljs.com/docs/formats/#inline
   BLOCK, // refer to https://quilljs.com/docs/formats/#block
@@ -42,6 +44,7 @@ class Attribute<T> {
     Attribute.style.key: Attribute.style,
     Attribute.token.key: Attribute.token,
     Attribute.script.key: Attribute.script,
+    Attribute.embed.key: Attribute.embed,
   });
 
   static final BoldAttribute bold = BoldAttribute();
@@ -99,6 +102,8 @@ class Attribute<T> {
   static const String mobileMargin = 'mobileMargin';
 
   static const String mobileAlignment = 'mobileAlignment';
+
+  static final EmbedAttribute embed = EmbedAttribute(null);
 
   static final Set<String> inlineKeys = {
     Attribute.bold.key,
@@ -341,4 +346,8 @@ class TokenAttribute extends Attribute<String> {
 // `script` is supposed to be inline attribute but it is not supported yet
 class ScriptAttribute extends Attribute<String> {
   ScriptAttribute(String val) : super('script', AttributeScope.IGNORE, val);
+}
+
+class EmbedAttribute extends Attribute<Embeddable?> {
+  EmbedAttribute(Embeddable? val) : super('embeddable', AttributeScope.EMBEDS, val);
 }

@@ -1,15 +1,17 @@
+import 'dart:collection';
 import 'dart:math' as math;
 
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
+import '../../../flutter_quill.dart';
 import '../../models/documents/document.dart';
 import '../../models/documents/nodes/leaf.dart';
 import '../../utils/delta.dart';
 import '../editor.dart';
 
 mixin RawEditorStateSelectionDelegateMixin on EditorState
-    implements TextSelectionDelegate {
+implements TextSelectionDelegate {
   @override
   TextEditingValue get textEditingValue {
     return widget.controller.plainTextEditingValue;
@@ -40,7 +42,18 @@ mixin RawEditorStateSelectionDelegateMixin on EditorState
       final pos = start;
       for (var i = 0; i < pasteStyle.length; i++) {
         final offset = pasteStyle[i].item1;
-        final style = pasteStyle[i].item2;
+        var style = pasteStyle[i].item2;
+
+        // 如果有嵌套结构需要单独拿出来插入
+        if(style.containsKey(Attribute.embed.key)){
+          var embedAttr = style.attributes[Attribute.embed.key];
+          if(embedAttr != null){
+            style = style.removeAll({embedAttr});
+            widget.controller.replaceText(
+                pos + offset, 1, embedAttr.value, null);
+          }
+        }
+
         widget.controller.formatTextStyle(
             pos + offset,
             i == pasteStyle.length - 1
@@ -112,7 +125,7 @@ mixin RawEditorStateSelectionDelegateMixin on EditorState
     additionalOffset = expandedRect.height >= editableSize.height
         ? editableSize.height / 2 - expandedRect.center.dy
         : 0.0
-            .clamp(expandedRect.bottom - editableSize.height, expandedRect.top);
+        .clamp(expandedRect.bottom - editableSize.height, expandedRect.top);
     unitOffset = const Offset(0, 1);
 
     // No overscrolling when encountering tall fonts/scripts that extend past
