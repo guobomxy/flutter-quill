@@ -31,6 +31,8 @@ class Embeddable {
 class BlockEmbed extends Embeddable {
   const BlockEmbed(String type, String data) : super(type, data);
 
+  static const blockTypeList = [videoType,linkCardType];
+
   static const String imageType = 'image';
   static BlockEmbed image(String imageUrl) => BlockEmbed(imageType, imageUrl);
 
@@ -41,4 +43,17 @@ class BlockEmbed extends Embeddable {
   static const String linkCardType = 'cardOfLink';
   static BlockEmbed linkCard(String script) => BlockEmbed(linkCardType, script);
 
+}
+
+class InlineEmbed extends Embeddable {
+  const InlineEmbed(String type, String data) : super(type, data);
+
+  static const String tagType = 'tag';
+  static Embeddable tagEmbed(String script) => Embeddable(tagType, script);
+
+  static const String metaType = 'meta';
+  static Embeddable metaEmbed(String script) => Embeddable(metaType, script);
+
+  static const String boardType = 'board';
+  static Embeddable boardEmbed(String script) => Embeddable(boardType, script);
 }

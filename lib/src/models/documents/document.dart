@@ -51,7 +51,7 @@ class Document {
   }
 
   final StreamController<Tuple3<Delta, Delta, ChangeSource>> _observer =
-      StreamController.broadcast();
+  StreamController.broadcast();
 
   final History _history = History();
 
@@ -222,7 +222,7 @@ class Document {
     final originalDelta = toDelta();
     for (final op in delta.toList()) {
       final style =
-          op.attributes != null ? Style.fromJson(op.attributes) : null;
+      op.attributes != null ? Style.fromJson(op.attributes) : null;
 
       if (op.isInsert) {
         // Must normalize data before inserting into the document, makes sure
@@ -270,7 +270,7 @@ class Document {
     for (var i = 0; i < ops.length; i++) {
       final op = ops[i];
       res.push(op);
-      _autoAppendNewlineAfterEmbeddable(i, ops, op, res, [BlockEmbed.videoType,BlockEmbed.linkCardType]);
+      _autoAppendNewlineAfterEmbeddable(i, ops, op, res, BlockEmbed.blockTypeList);
     }
     return res;
   }
@@ -333,7 +333,7 @@ class Document {
             'Document can only contain insert operations but ${op.key} found.');
       }
       final style =
-          op.attributes != null ? Style.fromJson(op.attributes) : null;
+      op.attributes != null ? Style.fromJson(op.attributes) : null;
       final data = _normalize(op.data);
       _root.insert(offset, data, style);
       offset += op.length!;
