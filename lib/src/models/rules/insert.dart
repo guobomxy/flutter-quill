@@ -512,6 +512,11 @@ class PreserveInlineStylesRule extends InsertRule {
     final attributes = prev.attributes;
     final text = data;
 
+    if (attributes != null && attributes.containsKey(Attribute.link.key) && text.startsWith(' ')) {
+      return Delta()
+        ..retain(index + (len ?? 0))
+        ..insert(text);
+    }
 
     return Delta()
       ..retain(index + (len ?? 0))
