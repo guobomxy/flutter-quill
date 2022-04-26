@@ -31,7 +31,7 @@ class Embeddable {
 class BlockEmbed extends Embeddable {
   const BlockEmbed(String type, String data) : super(type, data);
 
-  static const blockTypeList = [videoType,linkCardType];
+  static const blockTypeList = [videoType,linkCardType,imageType];
 
   static const String imageType = 'image';
   static BlockEmbed image(String imageUrl) => BlockEmbed(imageType, imageUrl);

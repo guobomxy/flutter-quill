@@ -130,10 +130,10 @@ class Line extends Container<Leaf?> {
 
     if (isLineFormat) {
       assert(
-      style.values.every((attr) =>
-      attr.scope == AttributeScope.BLOCK ||
-          attr.scope == AttributeScope.IGNORE),
-      'It is not allowed to apply inline attributes to line itself.');
+          style.values.every((attr) =>
+              attr.scope == AttributeScope.BLOCK ||
+              attr.scope == AttributeScope.IGNORE),
+          'It is not allowed to apply inline attributes to line itself.');
       _format(style);
     } else {
 
@@ -238,10 +238,10 @@ class Line extends Container<Leaf?> {
         if (newStyle.attributes.keys
             .any(Attribute.exclusiveBlockKeys.contains)) {
           parentStyle.removeWhere(
-                  (key, attr) => Attribute.exclusiveBlockKeys.contains(key));
+              (key, attr) => Attribute.exclusiveBlockKeys.contains(key));
         }
         parentStyle.removeWhere(
-                (key, attr) => newStyle?.attributes.keys.contains(key) ?? false);
+            (key, attr) => newStyle?.attributes.keys.contains(key) ?? false);
         final parentStyleToMerge = Style.attr(parentStyle);
         newStyle = newStyle.mergeAll(parentStyleToMerge);
         _applyBlockStyles(newStyle);
@@ -432,6 +432,11 @@ class Line extends Container<Leaf?> {
         if (node is Text) {
           result.add(Tuple2(pos + beg, node.style));
           pos += node.length;
+        } else if (node.value is Embeddable) {
+          final embedEntry = node.value as Embeddable;
+          final style = node.style.put(Attribute.clone(Attribute.embed, embedEntry));
+          result.add(Tuple2(pos + beg, style));
+          pos += node.length;
         }
       }
     }else{
@@ -443,7 +448,7 @@ class Line extends Container<Leaf?> {
     final remaining = len - local;
     if (remaining > 0) {
       final rest =
-      nextLine!.collectAllIndividualStyles(0, remaining, beg: local + beg);
+          nextLine!.collectAllIndividualStyles(0, remaining, beg: local + beg);
       result.addAll(rest);
     }
 

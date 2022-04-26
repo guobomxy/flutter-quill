@@ -11,7 +11,7 @@ import '../../utils/delta.dart';
 import '../editor.dart';
 
 mixin RawEditorStateSelectionDelegateMixin on EditorState
-implements TextSelectionDelegate {
+    implements TextSelectionDelegate {
   @override
   TextEditingValue get textEditingValue {
     return widget.controller.plainTextEditingValue;
@@ -30,7 +30,6 @@ implements TextSelectionDelegate {
     }
 
     final insertedText = _adjustInsertedText(diff.inserted);
-
     widget.controller.replaceText(
         diff.start, diff.deleted.length, insertedText, value.selection);
 
@@ -50,7 +49,7 @@ implements TextSelectionDelegate {
           if(embedAttr != null){
             style = style.removeAll({embedAttr});
             widget.controller.replaceText(
-                pos + offset, 1, embedAttr.value, null);
+                pos + offset, Embed.kObjectReplacementCharacter.length, embedAttr.value, null);
           }
         }
 
@@ -125,7 +124,7 @@ implements TextSelectionDelegate {
     additionalOffset = expandedRect.height >= editableSize.height
         ? editableSize.height / 2 - expandedRect.center.dy
         : 0.0
-        .clamp(expandedRect.bottom - editableSize.height, expandedRect.top);
+            .clamp(expandedRect.bottom - editableSize.height, expandedRect.top);
     unitOffset = const Offset(0, 1);
 
     // No overscrolling when encountering tall fonts/scripts that extend past

@@ -172,6 +172,8 @@ class QuillEditor extends StatefulWidget {
       this.customStyleBuilder,
       this.locale,
       this.floatingCursorDisabled = false,
+      this.limitContentHeight,
+      this.contentHeightLimitedCallback,
       Key? key})
       : super(key: key);
 
@@ -192,6 +194,11 @@ class QuillEditor extends StatefulWidget {
       keyboardAppearance: keyboardAppearance ?? Brightness.light,
     );
   }
+
+  final double? limitContentHeight;
+
+  /// 这个回调是在layout时 不能在该回调调用setState
+  final ValueChanged<bool>? contentHeightLimitedCallback;
 
   /// Controller object which establishes a link between a rich text document
   /// and this editor.
@@ -456,6 +463,8 @@ class QuillEditorState extends State<QuillEditor>
       linkActionPickerDelegate: widget.linkActionPickerDelegate,
       customStyleBuilder: widget.customStyleBuilder,
       floatingCursorDisabled: widget.floatingCursorDisabled,
+      limitContentHeight: widget.limitContentHeight,
+      contentHeightLimitedCallback: widget.contentHeightLimitedCallback,
     );
 
     final editor = I18n(
@@ -726,12 +735,16 @@ class RenderEditor extends RenderEditableContainerBox
     EdgeInsets floatingCursorAddedMargin =
         const EdgeInsets.fromLTRB(4, 4, 4, 5),
     double? maxContentWidth,
+    double? limitContentHeight,
+    ValueChanged<bool>? contentHeightLimitedCallback,
   })  : _hasFocus = hasFocus,
         _extendSelectionOrigin = selection,
         _startHandleLayerLink = startHandleLayerLink,
         _endHandleLayerLink = endHandleLayerLink,
         _cursorController = cursorController,
         _maxContentWidth = maxContentWidth,
+        _limitContentHeight = limitContentHeight,
+        _contentHeightLimitedCallback = contentHeightLimitedCallback,
         super(
           children: children,
           container: document.root,
@@ -743,12 +756,16 @@ class RenderEditor extends RenderEditableContainerBox
   final CursorCont _cursorController;
   final bool floatingCursorDisabled;
   final bool scrollable;
+  final ValueChanged<bool>? _contentHeightLimitedCallback;
 
   Document document;
   TextSelection selection;
   bool _hasFocus = false;
   LayerLink _startHandleLayerLink;
   LayerLink _endHandleLayerLink;
+
+  /// theChildOfLimitedHeight is the last render node with the maximum height
+  var theChildOfLimitedHeight;
 
   /// Called when the selection changes.
   TextSelectionChangedHandler onSelectionChanged;
@@ -872,6 +889,13 @@ class RenderEditor extends RenderEditableContainerBox
   set maxContentWidth(double? value) {
     if (_maxContentWidth == value) return;
     _maxContentWidth = value;
+    markNeedsLayout();
+  }
+
+  double? _limitContentHeight;
+  set limitContentHeight(double? value) {
+    if (_limitContentHeight == value) return;
+    _limitContentHeight = value;
     markNeedsLayout();
   }
 
@@ -1161,13 +1185,35 @@ class RenderEditor extends RenderEditableContainerBox
       final childParentData = child.parentData as EditableContainerParentData
         ..offset = Offset(resolvedPadding!.left + leftOffset, mainAxisExtent);
       mainAxisExtent += child.size.height;
+      if(_limitContentHeight != null && mainAxisExtent >= _limitContentHeight!){
+        theChildOfLimitedHeight = child;
+        _contentHeightLimitedCallback?.call(true);
+        break;
+      }
       assert(child.parentData == childParentData);
       child = childParentData.nextSibling;
     }
     mainAxisExtent += resolvedPadding!.bottom;
     size = constraints.constrain(Size(constraints.maxWidth, mainAxisExtent));
 
+    if(theChildOfLimitedHeight == null) {
+      _contentHeightLimitedCallback?.call(false);
+    }
+
     assert(size.isFinite);
+  }
+
+  @override
+  void defaultPaint(PaintingContext context, Offset offset) {
+    var child = firstChild;
+    while (child != null) {
+      final childParentData = child.parentData! as EditableContainerParentData;
+      context.paintChild(child, childParentData.offset + offset);
+      if(theChildOfLimitedHeight != null && theChildOfLimitedHeight == child) {
+        break;
+      }
+      child = childParentData.nextSibling;
+    }
   }
 
   @override
@@ -1186,6 +1232,33 @@ class RenderEditor extends RenderEditableContainerBox
         _cursorController.style.paintAboveText) {
       _paintFloatingCursor(context, offset);
     }
+  }
+
+  @override
+  bool defaultHitTestChildren(BoxHitTestResult result, { required Offset position }) {
+    var child = theChildOfLimitedHeight ?? lastChild;
+    // var isFound = false;
+    while (child != null) {
+      // if(!isFound && targetChild != null && targetChild == child) {
+      //   isFound = true;
+      //   continue;
+      // }
+      // The x, y parameters have the top left of the node's box as the origin.
+      final childParentData = child.parentData! as EditableContainerParentData;
+      final isHit = result.addWithPaintOffset(
+        offset: childParentData.offset,
+        position: position,
+        hitTest: (result, transformed) {
+          assert(transformed == position - childParentData.offset);
+          return child!.hitTest(result, position: transformed);
+        },
+      );
+      if (isHit) {
+        return true;
+      }
+      child = childParentData.previousSibling;
+    }
+    return false;
   }
 
   @override
