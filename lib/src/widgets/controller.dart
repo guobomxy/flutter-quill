@@ -76,9 +76,9 @@ class QuillController extends ChangeNotifier {
   Stream<Tuple3<Delta, Delta, ChangeSource>> get changes => document.changes;
 
   TextEditingValue get plainTextEditingValue => TextEditingValue(
-        text: document.toPlainText(),
-        selection: selection,
-      );
+    text: document.toPlainText(),
+    selection: selection,
+  );
 
   /// Only attributes applied to all characters within this range are
   /// included in the result.
@@ -98,7 +98,7 @@ class QuillController extends ChangeNotifier {
   /// Returns plain text for each node within selection
   String getPlainText() {
     final text =
-        document.getPlainText(selection.start, selection.end - selection.start);
+    document.getPlainText(selection.start, selection.end - selection.start);
     return text;
   }
 
@@ -123,8 +123,13 @@ class QuillController extends ChangeNotifier {
       // // cursor exceeds the length of document, position it in the end
       // updateSelection(
       // TextSelection.collapsed(offset: document.length), ChangeSource.LOCAL);
+      var offset = selection.baseOffset + len;
+      // print("GBGBOFFSET offset=$offset base=${selection.baseOffset} len=$len");
+
+      offset = offset <= -1 ? 0 : offset;
+
       updateSelection(
-          TextSelection.collapsed(offset: selection.baseOffset + len),
+          TextSelection.collapsed(offset: offset),
           ChangeSource.LOCAL);
     } else {
       // no need to move cursor
@@ -171,7 +176,7 @@ class QuillController extends ChangeNotifier {
           delta.last.data == '\n') {
         // if all attributes are inline, shouldRetainDelta should be false
         final anyAttributeNotInline =
-            toggledStyle.values.any((attr) => !attr.isInline);
+        toggledStyle.values.any((attr) => !attr.isInline);
         if (!anyAttributeNotInline) {
           shouldRetainDelta = false;
         }
@@ -293,7 +298,7 @@ class QuillController extends ChangeNotifier {
     textSelection = selection.copyWith(
         baseOffset: delta.transformPosition(selection.baseOffset, force: false),
         extentOffset:
-            delta.transformPosition(selection.extentOffset, force: false));
+        delta.transformPosition(selection.extentOffset, force: false));
     if (selection != textSelection) {
       _updateSelection(textSelection, source);
     }
