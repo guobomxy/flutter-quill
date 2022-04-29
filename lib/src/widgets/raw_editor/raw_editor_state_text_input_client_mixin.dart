@@ -179,12 +179,13 @@ implements TextInputClient {
 
           // 如果没有就清除相关inline格式
           Attribute.inlineKeys.forEach((key) {
-            if(!oldStyle.containsKey(key)){
+            if(!oldStyle.containsKey(key) || (diff.start == 0 && diff.inserted.length == 0)){ // 保证全部删除完之后清空原有样式
               attrs[key] = Attribute.fromKeyValue(key, null)!;
             }
           });
 
           var currStyle = Style.attr(attrs);
+          // print("GBGBIOS start=${diff.start} len=${diff.inserted.length} style=$currStyle");
           widget.controller.formatTextStyle(diff.start, diff.inserted.length, currStyle);
         }
 
